@@ -1,4 +1,3 @@
+## 1.0.0 - 2020-10-22
 
-# 1.0.0 - 202Y-MM-DD
-
-- initial release
+- Initial release
