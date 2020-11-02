@@ -5,67 +5,29 @@
 
 # haraka-plugin-batv
 
-Clone me, to create a new Haraka plugin!
+This Bounce Address Tag Validation plugin prevents being "spammed" by bounce messages. Bounce messages which aren't actually responses to messages that the user have sent out can be blocked with this SRS integration.
+It automatically changes the user of the sender for outgoing e-mails, by adding a generated key. And when an e-mail is recived with an empty sender (a bounce e-mail), by using the mentioned key, it checks whether it is a legitimate bounce message (a reply to a previous outgoing message). If it is a spam, drops it, if not, decodes the e-mail address and forwards it to the correct user.
 
-# Template Instructions
+This plugin uses srs.js script directly. For more information, please check: https://www.npmjs.com/package/srs.js
 
-These instructions will not self-destruct after use. Use and destroy.
+& IMPORTANT: this plugin must appear in  `config/plugins`  before other plugins that run on hook_rcpt
 
-See also, [How to Write a Plugin](https://github.com/haraka/Haraka/wiki/Write-a-Plugin) and [Plugins.md](https://github.com/haraka/Haraka/blob/master/docs/Plugins.md) for additional plugin writing information.
+## How it works
+Assume that the user uses the address example@domain.com and will send an e-mail.
 
-## Create a new repo for your plugin
+Before the e-mail is sent, example@domain.com will automatically change to:
+SRS0=HHH=TT=domain.com=example@domain.com
 
-Haraka plugins are named like `haraka-plugin-something`. All the namespace after `haraka-plugin-` is yours for the taking. Please check the [Plugins](https://github.com/haraka/Haraka/blob/master/Plugins.md) page and a Google search to see what plugins already exist.
+If the e-mail bounces, after checking if the key is correct or not or whether there is a key at all, it will be forwarded to example@domain.com.
 
-Once you've settled on a name, create the GitHub repo. On the repo's main page, click the _Clone or download_ button and copy the URL. Then paste that URL into a local ENV variable with a command like this:
 
-```sh
-export MY_GITHUB_ORG=haraka
-export MY_PLUGIN_NAME=haraka-plugin-SOMETHING
+## Configuration
+Please select a secret key and save it in the config/batv.ini file. Default configuration:
+```
+[srs]
+secret=asecretkey
 ```
 
-Clone and rename the batv repo:
-
-```sh
-git clone git@github.com:haraka/haraka-plugin-batv.git
-mv haraka-plugin-batv $MY_PLUGIN_NAME
-cd $MY_PLUGIN_NAME
-git remote rm origin
-git remote add origin "git@github.com:$MY_GITHUB_ORG/$MY_PLUGIN_NAME.git"
-```
-
-Now you'll have a local git repo to begin authoring your plugin
-
-## rename boilerplate
-
-Replaces all uses of the word `batv` with your plugin's name.
-
-./redress.sh [something]
-
-You'll then be prompted to update package.json and then force push this repo onto the GitHub repo you've created earlier.
-
-
-# Add your content here
-
-## INSTALL
-
-```sh
-cd /path/to/local/haraka
-npm install haraka-plugin-batv
-echo "batv" >> config/plugins
-service haraka restart
-```
-
-### Configuration
-
-If the default configuration is not sufficient, copy the config file from the distribution into your haraka config dir and then modify it:
-
-```sh
-cp node_modules/haraka-plugin-batv/config/batv.ini config/batv.ini
-$EDITOR config/batv.ini
-```
-
-## USAGE
 
 
 <!-- leave these buried at the bottom of the document -->
