@@ -1,6 +1,6 @@
 'use strict'
 
-// Put this plugin's name before rcpt_to.in_host_list in the config/plugins file.
+// Put this plugin's name before all the rcpt_to plugins in the config/plugins file.
 
 const Address = require('address-rfc2821').Address;
 
@@ -23,34 +23,33 @@ exports.load_batv_ini = function () {
   function () {
     plugin.load_batv_ini()
   });
+
+  var maxAgeSeconds = 21 * 24 * 60 * 60; // default: 21 days 
+  if(plugin.cfg.srs.maxAgeSeconds) maxAgeSeconds = plugin.cfg.srs.maxAgeSeconds;
+  else if(plugin.cfg.srs.maxAgeDays) maxAgeSeconds = plugin.cfg.srs.maxAgeDays * 24 * 60 * 60;
+
   rewriter = new SRS({
-    secret: plugin.cfg.srs.secret
+    secret: plugin.cfg.srs.secret,
+    maxAge: maxAgeSeconds
   });
 }
 
 exports.rcpt = function (next, connection, params) { // Check the rcpt and decide if it is spam or not.
   var txn = connection.transaction;
   const plugin = this;
-  if(!connection.relaying && txn.mail_from.isNull() || true) { // Incoming
-      var oldUser = txn.rcpt_to[0].user;
-      var reversed;
-
-      try {
-        reversed = rewriter.reverse(oldUser);
-      }
-      catch(err) {
-        connection.logdebug(plugin, err);
-      }
-
-      if(reversed === null || reversed === undefined) {
-        connection.logdebug(plugin, "marking " + txn.rcpt_to + " for drop");
-        connection.transaction.notes.discard = true;
-      }
-      else {
-        txn.rcpt_to.pop();
-        var sendTo = reversed[0] + "@" + reversed[1];
-        txn.rcpt_to.push(new Address(`<${sendTo}>`));
-      }
+  if(!connection.relaying && txn.mail_from.isNull()) { // Incoming
+    var oldUser = txn.rcpt_to[0].user;
+    var reversed = rewriter.reverse(oldUser);
+    
+    if(reversed === null || reversed === undefined) {
+      connection.logdebug(plugin, "marking " + txn.rcpt_to + " for drop");
+      connection.transaction.notes.discard = true;
+    }
+    else {
+      txn.rcpt_to.pop();
+      var sendTo = reversed[0] + "@" + reversed[1];
+      txn.rcpt_to.push(new Address(`<${sendTo}>`));
+    }
   }
 
   next();

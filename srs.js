@@ -6,7 +6,7 @@ var crypto = require("crypto");
 var timeBaseChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567",
   timeSize = 2,
   timeBaseBits = 5,
-  timePrecision = (60 * 60 * 24),
+  timePrecision = 1, // second based
   timeSlots = (1<<(timeBaseBits<<(timeSize-1))),
   validSeparators = "=-+";
 
@@ -36,7 +36,6 @@ function checkTimestamp(str, maxAge) {
   while(now < then) {
     now = now + timeSlots;
   }
-
   return now <= then + maxAge;
 }
 
@@ -44,7 +43,7 @@ function SRS(options) {
   options = options || {};
   this.secret = options.secret;
   this.separator = (options.separator || "=")[0];
-  this.maxAge = options.maxAge || 21;
+  this.maxAge = options.maxAge || (21 * 24 * 60 * 60); // 21 days
 
   if (!this.secret) {
     throw new TypeError("A secret must be provided");
@@ -91,7 +90,7 @@ SRS.prototype.rewrite = function(local, domain) {
                   "=" + domain + "=" + local;
 };
 
-SRS.prototype.reverse = function(address) {
+SRS.prototype.reverse = function(address, addressDomain) {
   var matches, hash, timestamp, domain, local, expectedHash;
 
   if (this.isSrs0(address)) {

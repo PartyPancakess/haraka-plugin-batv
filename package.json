@@ -25,6 +25,9 @@
     "url": "https://github.com/PartyPancakess/haraka-plugin-batv/issues"
   },
   "homepage": "https://github.com/PartyPancakess/haraka-plugin-batv#readme",
+  "dependencies": {
+    "address-rfc2821": "*"
+  },
   "devDependencies": {
     "eslint": "*",
     "eslint-plugin-haraka": "*",

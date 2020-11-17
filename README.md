@@ -22,10 +22,11 @@ If the e-mail bounces, after checking if the key is correct or not or whether th
 
 
 ## Configuration
-Please select a secret key and save it in the config/batv.ini file. Default configuration:
+Please select a secret key and (optionally) a maxAge and save it in the config/batv.ini file. Default configuration:
 ```
 [srs]
 secret=asecretkey
+maxAgeDays=21
 ```
 
 
