@@ -2,7 +2,7 @@
 
 // Put this plugin's name before all the rcpt_to plugins in the config/plugins file.
 
-const Address = require('address-rfc2821').Address;
+const Address = require('../haraka-necessary-helper-plugins/address-rfc2821').Address;
 
 var SRS = require("./srs.js");
 var rewriter;
